@@ -57,27 +57,21 @@ def spec_to_xyz(spectrum):
 def xyz_to_rgb(xyz, exposure):
     # XYZ to sRGB linear
     # the multiply by 120000 is a hack to get a brighter image
-    sRGBlinear = np.dot(illuminant_D65, xyz) * 120000
+    sRGB_linear = np.dot(illuminant_D65, xyz) * 120000
 
     # apply exposure
-    sRGB_exposed = sRGBlinear * pow(2, exposure)
+    sRGB_exp = sRGB_linear * pow(2, exposure)
 
     # avoid infinite values
-    for i in range(3):
-        if sRGB_exposed[i] <= 0:
-            sRGB_exposed[i] = 1e-5
+    sRGB_1 = np.where(sRGB_exp <= 0, 1e-5, sRGB_exp)
 
     # apply filmic log encoding
-    sRGB_log = (np.log2(sRGB_exposed / 0.18) + 10) / 16.5
+    sRGB_log = (np.log2(sRGB_1 / 0.18) + 10) / 16.5
 
     # avoid negative values
-    sRGB = np.zeros(3)
-    for i in range(3):
-        if sRGB_log[i] <= 0:
-            sRGB_log[i] = 1e-5
+    sRGB_2 = np.where(sRGB_log <= 0, 1e-5, sRGB_log)
 
-        # apply look contrast
-        index = int(sRGB_log[i] * 4095)
-        sRGB[i] = filmic_look[index]
-
-    return sRGB
+    # apply look contrast
+    index = np.array(sRGB_2 * 4095, np.int)
+    
+    return np.array([filmic_look[i] for i in index])

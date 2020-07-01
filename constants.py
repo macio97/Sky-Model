@@ -4,7 +4,7 @@ import numpy as np
 from properties import look
 
 
-# Globals
+# Constants
 h = 6.62607004e-34                                  # Planck's constant
 c = 299792458                                       # speed of light (m/s)
 T = 5778                                            # sun's Temperature (k)
@@ -14,6 +14,7 @@ N = 2.504e25                                        # number density of air (mol
 Do = 2.687e20                                       # Dobson unit (molecules/m^2)
 rayleigh_scale = 8000                               # Rayleigh scale height (m)
 mie_scale = 1200                                    # Mie scale height (m)
+mie_coeff = 2e-5									# Mie scattering coefficient (m^-1)
 mie_G = 0.76                                        # aerosols anisotropy
 sqr_G = mie_G * mie_G                               # quared mie_G
 ozone_max = 300 * Do / 15e3                         # Maximum number density of ozone molecules (m^-3)
@@ -43,8 +44,6 @@ sun = (2 * pi * h * c * c) / (lam**5 * (np.exp((h * c) / (k * T * lam)) - 1)) * 
 irradiance = sun * ((sun_radius * sun_radius) / (earth_sun * earth_sun))
 # Rayleigh scattering coefficient (m^-1)
 rayleigh_coeff = ((8 * pi**3) * (n * n - 1)**2) / (3 * N * lam**4)
-# Mie scattering coefficient (m^-1)
-mie_coeff = 2e-5
 # Ozone cross section (cm^2/molecule) to coefficient (m^-1)
 ozone_cross = np.loadtxt('data/ozone_cross_section.csv', usecols=(1))
 ozone_coeff = ozone_cross * 10**-4 * ozone_max
@@ -56,4 +55,5 @@ def read_filmic_look(path):
 			nums.append(float(line))
 	return nums
 
+# filmic contrast
 filmic_look = read_filmic_look("looks/" + look + ".txt")
