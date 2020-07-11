@@ -2,13 +2,15 @@
 import functions as fun
 import numpy as np
 from constants import earth_radius, irradiance, mie_coeff, num_wavelengths, ozone_coeff, rayleigh_coeff
-from math import ceil, cos, exp, pi, radians, sin, sqrt, dist
+from math import cos, exp, pi, radians, sin, sqrt, dist
 from properties import air_density, altitude, dust_density, ozone_density, steps, steps_light, sun_lat
 
 
 # Definitions
-cam_altitude = 1000 * fun.clamp(altitude, 0.001, 59.999)
+# convert altitude from km to m and clamp to avoid intersection issues
+cam_altitude = 1000 * max(min(altitude, 59.999), 0.001)
 cam_pos = np.array([0, 0, earth_radius + cam_altitude])
+# convert sun latitude and longitude to vector
 sun_dir = fun.geographical_to_direction(radians(sun_lat), 0)
 coefficients = np.array([rayleigh_coeff, 1.11 * mie_coeff, ozone_coeff], dtype=np.object)
 density_multipliers = np.array([air_density, dust_density, ozone_density])
@@ -78,5 +80,5 @@ def single_scattering(ray_dir):
         # advance along ray
         P += segment
 
-    # spectrum at pixel
+    # spectrum at pixel in radiance (W/(m^2*sr))
     return spectrum * irradiance * segment_length

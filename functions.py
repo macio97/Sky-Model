@@ -5,12 +5,6 @@ from math import cos, exp, pi, sin, sqrt, pow
 
 
 # Functions
-def clamp(value, min, max):
-    if value < min:
-        return min
-    if value > max:
-        return max
-
 def density_rayleigh(height):
     return exp(-height / rayleigh_scale)
 
@@ -51,14 +45,14 @@ def surface_intersection(pos, dir):
         return False
 
 def spec_to_xyz(spectrum):
-    # xyz tristimulus values
-    return (np.sum(spectrum[:, np.newaxis] * cmf, axis=0)) * wavelengths_step * max_luminous_efficacy
+    # integral
+    sum = np.sum(spectrum[:, np.newaxis] * cmf, axis=0)
+    return sum * wavelengths_step * max_luminous_efficacy
 
 def xyz_to_rgb(xyz, exposure):
     # XYZ to sRGB linear
-    # the multiply by 120000 is a hack to get a brighter image
-    sRGB_linear = np.dot(illuminant_D65, xyz) * 120000
-
+    sRGB_linear = np.dot(illuminant_D65, xyz)
+    
     # apply exposure
     sRGB_exp = sRGB_linear * pow(2, exposure)
 
@@ -71,7 +65,10 @@ def xyz_to_rgb(xyz, exposure):
     # avoid negative values
     sRGB_2 = np.where(sRGB_log <= 0, 1e-5, sRGB_log)
 
+    # clamp values higher than 1
+    sRGB_3 = np.where(sRGB_2 > 1, 1, sRGB_2)
+
     # apply look contrast
-    index = np.array(sRGB_2 * 4095, np.int)
+    index = np.array(sRGB_3 * 4095, np.int)
     
     return np.array([filmic_look[i] for i in index])
