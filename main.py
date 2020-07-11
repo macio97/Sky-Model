@@ -23,6 +23,7 @@ def n_threads():
     else:
         return (int)(os.popen('grep -c cores /proc/cpuinfo').read())
 
+
 # number of threads
 nprocess = n_threads()
 
@@ -61,7 +62,7 @@ def multiprocess():
     for i in range(nprocess):
         start_x = int((halfx / nprocess) * i)
         end_x = int((halfx / nprocess) * (i + 1))
-        process = Process(target = calc_pixel, args = (start_x, end_x, pix_array))
+        process = Process(target=calc_pixel, args=(start_x, end_x, pix_array))
         processes.append(process)
         process.start()
 
@@ -77,7 +78,8 @@ def multiprocess():
         for j in range(pixels_y):
             pos = pos_y + j * 3
             # convert RGB to tuple
-            rgb = tuple([pix_array[pos], pix_array[pos + 1], pix_array[pos + 2]])
+            rgb = tuple(
+                [pix_array[pos], pix_array[pos + 1], pix_array[pos + 2]])
             # store pixels
             pixels[i, j] = rgb
             # mirror pixels

@@ -12,7 +12,8 @@ cam_altitude = 1000 * max(min(altitude, 59.999), 0.001)
 cam_pos = np.array([0, 0, earth_radius + cam_altitude])
 # convert sun latitude and longitude to vector
 sun_dir = fun.geographical_to_direction(radians(sun_lat), 0)
-coefficients = np.array([rayleigh_coeff, 1.11 * mie_coeff, ozone_coeff], dtype=np.object)
+coefficients = np.array(
+    [rayleigh_coeff, 1.11 * mie_coeff, ozone_coeff], dtype=np.object)
 density_multipliers = np.array([air_density, dust_density, ozone_density])
 
 
@@ -31,7 +32,8 @@ def ray_optical_depth(ray_origin, ray_dir):
         # height above sea level
         height = sqrt(np.dot(P, P)) - earth_radius
         # accumulate optical depth of this segment
-        density = np.array([fun.density_rayleigh(height), fun.density_mie(height), fun.density_ozone(height)])
+        density = np.array([fun.density_rayleigh(
+            height), fun.density_mie(height), fun.density_ozone(height)])
         optical_depth += density
         # advance along ray
         P += segment
@@ -62,7 +64,8 @@ def single_scattering(ray_dir):
         # height above sea level
         height = sqrt(np.dot(P, P)) - earth_radius
         # evaluate and accumulate optical depth along the ray
-        densities = np.array([fun.density_rayleigh(height), fun.density_mie(height), fun.density_ozone(height)])
+        densities = np.array([fun.density_rayleigh(
+            height), fun.density_mie(height), fun.density_ozone(height)])
         density = density_multipliers * densities
         optical_depth += density * segment_length
 
@@ -70,12 +73,15 @@ def single_scattering(ray_dir):
         if not fun.surface_intersection(P, sun_dir):
             optical_depth_light = ray_optical_depth(P, sun_dir)
             # attenuation of light
-            extinction_density = (optical_depth + density_multipliers * optical_depth_light) * coefficients
+            extinction_density = (
+                optical_depth + density_multipliers * optical_depth_light) * coefficients
             attenuation = np.exp(-np.sum(extinction_density))
             scattering_density_R = density[0] * rayleigh_coeff
             scattering_density_M = density[1] * mie_coeff
             # compute spectrum
-            spectrum += attenuation * (phase_function_R * scattering_density_R + phase_function_M * scattering_density_M)
+            spectrum += attenuation * \
+                (phase_function_R * scattering_density_R +
+                 phase_function_M * scattering_density_M)
 
         # advance along ray
         P += segment
