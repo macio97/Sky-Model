@@ -54,7 +54,7 @@ def single_scattering(ray_dir):
     spectrum = np.zeros(num_wavelengths)
     # cosine of angle between camera and sun
     mu = np.dot(ray_dir, sun_dir)
-    # phase function for scattering
+    # phase functions (sr^-1)
     phase_function_R = fun.phase_rayleigh(mu)
     phase_function_M = fun.phase_mie(mu)
     # the density and in-scattering of each segment is evaluated at its middle
@@ -86,5 +86,5 @@ def single_scattering(ray_dir):
         # advance along ray
         P += segment
 
-    # spectrum at pixel in radiance (W/(m^2*sr))
+    # spectrum at pixel in radiance (W*m^-2*sr^-1)
     return spectrum * irradiance * segment_length

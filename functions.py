@@ -1,7 +1,7 @@
 # Libraries
 import numpy as np
 from constants import atmosphere_radius, cmf, earth_radius, filmic_look, illuminant_D65, max_luminous_efficacy, mie_G, mie_scale, rayleigh_scale, sqr_G, wavelengths_step
-from math import cos, exp, pi, sin, sqrt, pow
+from math import cos, exp, pi, radians, sin, sqrt, pow
 
 
 # Functions
@@ -44,10 +44,10 @@ def atmosphere_intersection(pos, dir):
 def surface_intersection(pos, dir):
     if dir[2] >= 0:
         return False
-    t = np.dot(dir, -pos) / np.sum(dir * dir)
-    D = pos[0] * pos[0] - 2 * -pos[0] * dir[0] * t + pow(dir[0] * t, 2) + pos[1] * pos[1] - 2 * (-pos[1]) * dir[1] * t + pow(
-        dir[1] * t, 2) + pos[2] * pos[2] - 2 * (-pos[2]) * dir[2] * t + pow(dir[2] * t, 2)
-    if D <= (earth_radius * earth_radius):
+    b = -2 * np.dot(dir, -pos)
+    c = np.sum(pos * pos) - earth_radius * earth_radius
+    t = b * b - 4 * c
+    if t >= 0:
         return True
     else:
         return False
