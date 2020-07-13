@@ -14,7 +14,7 @@ steps_light = 16
 pixels_x = 128
 pixels_y = 32
 # exposure
-exposure = -13
+exposure = -3.5
 # look (contrast)
 look = "high_contrast"
 # save PNG image in current folder

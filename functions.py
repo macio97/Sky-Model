@@ -1,10 +1,11 @@
 # Libraries
 import numpy as np
-from constants import atmosphere_radius, cmf, earth_radius, filmic_look, illuminant_D65, max_luminous_efficacy, mie_G, mie_scale, rayleigh_scale, sqr_G, wavelengths_step
-from math import cos, exp, pi, radians, sin, sqrt, pow
-
+from constants import atmosphere_radius, cmf, earth_radius, filmic_look, illuminant_D65, mie_G, mie_scale, rayleigh_scale, sqr_G, wavelengths_step
+from math import cos, exp, pi, sin, sqrt
 
 # Functions
+
+
 def density_rayleigh(height):
     return exp(-height / rayleigh_scale)
 
@@ -14,12 +15,12 @@ def density_mie(height):
 
 
 def density_ozone(height):
-    if height < 10000 or height >= 40000:
+    if height < 10e3 or height >= 40e3:
         return 0
-    elif height >= 10000 and height < 25000:
-        return 1 / 15000 * height - 2 / 3
+    elif height >= 10e3 and height < 25e3:
+        return 1 / 15e3 * height - 2 / 3
     else:
-        return -(1 / 15000 * height - 8 / 3)
+        return -(1 / 15e3 * height - 8 / 3)
 
 
 def phase_rayleigh(mu):
@@ -27,7 +28,7 @@ def phase_rayleigh(mu):
 
 
 def phase_mie(mu):
-    return (3 * (1 - sqr_G) * (1 + mu * mu)) / (8 * pi * (2 + sqr_G) * pow((1 + sqr_G - 2 * mie_G * mu), 1.5))
+    return (3 * (1 - sqr_G) * (1 + mu * mu)) / (8 * pi * (2 + sqr_G) * ((1 + sqr_G - 2 * mie_G * mu)**1.5))
 
 
 def geographical_to_direction(lat, lon):
@@ -56,7 +57,7 @@ def surface_intersection(pos, dir):
 def spec_to_xyz(spectrum):
     # integral
     sum = np.sum(spectrum[:, np.newaxis] * cmf, axis=0)
-    return sum * wavelengths_step * max_luminous_efficacy
+    return sum * wavelengths_step
 
 
 def xyz_to_rgb(xyz, exposure):
@@ -64,7 +65,7 @@ def xyz_to_rgb(xyz, exposure):
     sRGB_linear = np.dot(illuminant_D65, xyz)
 
     # apply exposure
-    sRGB_exp = sRGB_linear * pow(2, exposure)
+    sRGB_exp = sRGB_linear * 2**exposure
 
     # avoid negative values
     sRGB_1 = np.maximum(1e-5, sRGB_exp)

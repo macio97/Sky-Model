@@ -86,5 +86,5 @@ def single_scattering(ray_dir):
         # advance along ray
         P += segment
 
-    # spectrum at pixel in radiance (W*m^-2*sr^-1)
-    return spectrum * irradiance * segment_length
+    # spectrum at pixel in radiance (W*m^-2*nm^-1*sr^-1)
+    return irradiance * spectrum * segment_length
