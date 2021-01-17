@@ -1,17 +1,16 @@
 # Libraries
 import numpy as np
-from constants import atmosphere_radius, cmf, earth_radius, filmic_look, illuminant_D65, mie_G, mie_scale, rayleigh_scale, sqr_G, wavelengths_step
+from constants import ATMOSPHERE_RADIUS, COLOR_MATCHING_FUNCTIONS, EARTH_RADIUS, FILMIC_LOOK, ILLUMINANT_D65, MIE_G, MIE_SCALE, RAYLEIGH_SCALE, SQR_G, WAVELENGTHS_STEP
 from math import cos, exp, pi, sin, sqrt
 
+
 # Functions
-
-
 def density_rayleigh(height):
-    return exp(-height / rayleigh_scale)
+    return exp(-height / RAYLEIGH_SCALE)
 
 
 def density_mie(height):
-    return exp(-height / mie_scale)
+    return exp(-height / MIE_SCALE)
 
 
 def density_ozone(height):
@@ -28,7 +27,7 @@ def phase_rayleigh(mu):
 
 
 def phase_mie(mu):
-    return (3 * (1 - sqr_G) * (1 + mu * mu)) / (8 * pi * (2 + sqr_G) * ((1 + sqr_G - 2 * mie_G * mu)**1.5))
+    return (3 * (1 - SQR_G) * (1 + mu * mu)) / (8 * pi * (2 + SQR_G) * ((1 + SQR_G - 2 * MIE_G * mu)**1.5))
 
 
 def geographical_to_direction(lat, lon):
@@ -37,7 +36,7 @@ def geographical_to_direction(lat, lon):
 
 def atmosphere_intersection(pos, dir):
     b = -2 * np.dot(dir, -pos)
-    c = np.sum(pos * pos) - atmosphere_radius * atmosphere_radius
+    c = np.sum(pos * pos) - ATMOSPHERE_RADIUS * ATMOSPHERE_RADIUS
     t = (-b + sqrt(b * b - 4 * c)) / 2
     return pos + dir * t
 
@@ -46,7 +45,7 @@ def surface_intersection(pos, dir):
     if dir[2] >= 0:
         return False
     b = -2 * np.dot(dir, -pos)
-    c = np.sum(pos * pos) - earth_radius * earth_radius
+    c = np.sum(pos * pos) - EARTH_RADIUS * EARTH_RADIUS
     t = b * b - 4 * c
     if t >= 0:
         return True
@@ -56,13 +55,13 @@ def surface_intersection(pos, dir):
 
 def spec_to_xyz(spectrum):
     # integral
-    sum = np.sum(spectrum[:, np.newaxis] * cmf, axis=0)
-    return sum * wavelengths_step
+    sum = np.sum(spectrum[:, np.newaxis] * COLOR_MATCHING_FUNCTIONS, axis=0)
+    return sum * WAVELENGTHS_STEP
 
 
 def xyz_to_rgb(xyz, exposure):
     # XYZ to sRGB linear
-    sRGB_linear = np.dot(illuminant_D65, xyz)
+    sRGB_linear = np.dot(ILLUMINANT_D65, xyz)
 
     # apply exposure
     sRGB_exp = sRGB_linear * 2**exposure
@@ -79,4 +78,4 @@ def xyz_to_rgb(xyz, exposure):
     # apply look contrast
     index = np.array(sRGB_2 * 4095, np.int)
 
-    return np.array([filmic_look[i] for i in index])
+    return np.array([FILMIC_LOOK[i] for i in index])
