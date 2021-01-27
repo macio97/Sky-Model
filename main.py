@@ -42,7 +42,7 @@ def calc_pixel(xmin, xmax, pix_array):
             # get spectrum from camera direction
             spectrum = light.single_scattering(cam_dir)
             # convert spectrum to xyz
-            xyz = fun.spec_to_xyz(spectrum)
+            xyz = fun.spectrum_to_xyz(spectrum)
             # convert xyz to rgb
             rgb = fun.xyz_to_rgb(xyz, exposure)
             rgb_int = np.array(rgb * 255, np.int)

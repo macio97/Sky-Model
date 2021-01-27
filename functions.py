@@ -53,7 +53,7 @@ def surface_intersection(pos, dir):
         return False
 
 
-def spec_to_xyz(spectrum):
+def spectrum_to_xyz(spectrum):
     # integral
     sum = np.sum(spectrum[:, np.newaxis] * COLOR_MATCHING_FUNCTIONS, axis=0)
     return sum * WAVELENGTHS_STEP

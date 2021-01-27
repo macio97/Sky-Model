@@ -19,8 +19,8 @@ density_multipliers = np.array([air_density, dust_density, ozone_density])
 
 def ray_optical_depth(ray_origin, ray_dir):
     # optical depth along a ray through the atmosphere
-    ray_end = fun.atmosphere_intersection(ray_origin, ray_dir)
-    ray_length = dist(ray_origin, ray_end)
+    end_point = fun.atmosphere_intersection(ray_origin, ray_dir)
+    ray_length = dist(ray_origin, end_point)
     # step along the ray in segments and accumulate the optical depth along each segment
     segment_length = ray_length / steps_light
     segment = segment_length * ray_dir
@@ -43,9 +43,9 @@ def ray_optical_depth(ray_origin, ray_dir):
 
 def single_scattering(ray_dir):
     # intersection between camera and top of atmosphere
-    ray_end = fun.atmosphere_intersection(cam_pos, ray_dir)
+    end_point = fun.atmosphere_intersection(cam_pos, ray_dir)
     # distance from camera to top of atmosphere
-    ray_length = dist(cam_pos, ray_end)
+    ray_length = dist(cam_pos, end_point)
     # to compute the inscattering, we step along the ray in segments and
     # accumulate the inscattering as well as the optical depth along each segment
     segment_length = ray_length / steps
