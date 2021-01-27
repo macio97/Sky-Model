@@ -12,8 +12,8 @@ cam_altitude = 1000 * max(min(altitude, 59.999), 0.001)
 cam_pos = np.array([0, 0, EARTH_RADIUS + cam_altitude])
 # convert sun latitude and longitude to vector
 sun_dir = fun.geographical_to_direction(radians(sun_lat), 0)
-coefficients = np.array(
-    [RAYLEIGH_COEFFICIENT, 1.11 * MIE_COEFFICIENT, OZONE_COEFFICIENT], dtype=np.object)
+coefficients = np.array([RAYLEIGH_COEFFICIENT, 1.11 *
+                         MIE_COEFFICIENT, OZONE_COEFFICIENT], dtype=np.object)
 density_multipliers = np.array([air_density, dust_density, ozone_density])
 
 
@@ -26,17 +26,17 @@ def ray_optical_depth(ray_origin, ray_dir):
     segment = segment_length * ray_dir
     optical_depth = np.zeros(3)
     # the density of each segment is evaluated at its middle
-    P = ray_origin + 0.5 * segment
+    middle_point = ray_origin + 0.5 * segment
 
     for _ in range(steps_light):
         # height above sea level
-        height = sqrt(np.dot(P, P)) - EARTH_RADIUS
+        height = sqrt(np.dot(middle_point, middle_point)) - EARTH_RADIUS
         # accumulate optical depth of this segment
         density = np.array([fun.density_rayleigh(
             height), fun.density_mie(height), fun.density_ozone(height)])
         optical_depth += density
         # advance along ray
-        P += segment
+        middle_point += segment
 
     return optical_depth * segment_length
 
@@ -58,11 +58,11 @@ def single_scattering(ray_dir):
     phase_function_R = fun.phase_rayleigh(mu)
     phase_function_M = fun.phase_mie(mu)
     # the density and in-scattering of each segment is evaluated at its middle
-    P = cam_pos + 0.5 * segment
+    middle_point = cam_pos + 0.5 * segment
 
     for _ in range(steps):
         # height above sea level
-        height = sqrt(np.dot(P, P)) - EARTH_RADIUS
+        height = sqrt(np.dot(middle_point, middle_point)) - EARTH_RADIUS
         # evaluate and accumulate optical depth along the ray
         densities = np.array([fun.density_rayleigh(
             height), fun.density_mie(height), fun.density_ozone(height)])
@@ -70,8 +70,8 @@ def single_scattering(ray_dir):
         optical_depth += density * segment_length
 
         # if the Earth isn't in the way, evaluate inscattering from the sun
-        if not fun.surface_intersection(P, sun_dir):
-            optical_depth_light = ray_optical_depth(P, sun_dir)
+        if not fun.surface_intersection(middle_point, sun_dir):
+            optical_depth_light = ray_optical_depth(middle_point, sun_dir)
             # attenuation of light
             extinction_density = (
                 optical_depth + density_multipliers * optical_depth_light) * coefficients
@@ -84,7 +84,7 @@ def single_scattering(ray_dir):
                  phase_function_M * scattering_density_M)
 
         # advance along ray
-        P += segment
+        middle_point += segment
 
     # spectrum at pixel in radiance (W*m^-2*nm^-1*sr^-1)
     return IRRADIANCE * spectrum * segment_length
